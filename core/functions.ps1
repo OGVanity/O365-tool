@@ -46,7 +46,7 @@ FUNCTION CHECK_MODULE ($module) {
         "EXCHANGE" {
             $exchangeModule = Get-Module ExchangeOnlineManagement -ListAvailable
             if ($exchangeModule.count -eq 0) {
-                Write-Host -ForegroundColor "Red" ("`nERROR: EXCHANGE MODULE MISSING!`n[Y] TO INSTALL`n[N] TO RETURN`n")
+                Write-Host -ForegroundColor "Red" ("`nERROR: EXCHANGE MODULE MISSING!`n[Y] TO INSTALL`n[N] TO RETURN")
                 $moduleInstall = Read-Host -Prompt ("INPUT SELECTION")
                 if ($moduleInstall -match "[yY]") { 
                     Write-Host -ForegroundColor "Green" ("`nNOW ATTEMPTING TO INSTALL THE EXCHANGE MODULE...")
@@ -66,7 +66,7 @@ FUNCTION CHECK_MODULE ($module) {
         "AZUREAD" {
             $azureModule = Get-Module AzureAD -ListAvailable
             if ($azureModule.count -eq 0) {
-                Write-Host -ForegroundColor "Red" ("`nERROR: AZURE AD MODULE MISSING!`n[Y] TO INSTALL`n[N] TO RETURN`n")
+                Write-Host -ForegroundColor "Red" ("`nERROR: AZURE AD MODULE MISSING!`n[Y] TO INSTALL`n[N] TO RETURN")
                 $moduleInstall = Read-Host -Prompt ("INPUT SELECTION")
                 if ($moduleInstall -match "[yY]") { 
                     Write-Host -ForegroundColor "Green" ("`nNOW ATTEMPTING TO INSTALL THE AZURE AD MODULE...")
@@ -101,5 +101,77 @@ FUNCTION EXCHANGE_ACTIONS {
         |                                           |
         - - - - - - - - - - - - - - - - - - - - - - -
     ")
-    $toolSelection = Read-Host -Prompt ("INPUT SELECTION")
+    $toolSelection = Read-Host -Prompt ("INPUT MODULE SELECTION (1-2)")
+    switch ($toolSelection) {
+        1 {
+            Write-Host -ForegroundColor "Cyan" ("`nSELECTED MAILBOX PERMISSIONS TOOL`nLOADING FUNCTION...")
+            MAILBOX_TOOL("PERMISSIONS")
+        }
+        2 {
+            Write-Host -ForegroundColor "Cyan" ("`nSELECTED MAILBOX SETTINGS TOOL`nLOADING FUNCTION...")
+            MAILBOX_TOOL("SETTINGS")
+        }
+        default {
+            Write-Host -ForegroundColor "Red" ("`nUNDEFINED INPUT - RETURNING...")
+            EXCHANGE_ACTIONS
+        }
+    }
+}
+
+FUNCTION MAILBOX_TOOL ($action) {
+    switch ($action) {
+        "PERMISSIONS" {
+            Write-Host -ForegroundColor "Cyan" ("`nCLEARING CONSOLE...")
+            Clear-Host
+            Write-Host -ForegroundColor "Cyan" ("
+                - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                |                                                                                   |
+                |                           SELECT PERMISSION TYPE:                                 |
+                |                           - - - - - - - - - - - -                                 |
+                |                                                                                   |
+                |   1: MANAGE DIRECT MAILBOX PERMS      |       4: REMOVE AUTO MAPPING              |
+                |   2: MANAGE BULK MAILBOX PERMS        |       5: REMOVE AUTO MAPPING BULK         |
+                |   3: MANAGE CALENDAR / FOLDER PERMS   |       6: RUN MAILBOX PERMISSION REPORT    |
+                |                                                                                   |               
+                - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            ")
+            $permissionSelection = Read-Host -Prompt ("INPUT MODULE SELECTION (1-6)")
+            $objectEmail = Read-Host -Prompt ("ENTER EMAIL ADDRESS OF THE OBJECT BEING CHANGED")
+            #CHECK_EMAIL($objectEmail)
+            switch ($permissionSelection) {
+                1 {
+                    $userEmail = Read-Host -Prompt ("ENTER EMAIL ADDRESS OF THE USER GETTING PERMS")
+                    #CHECK_EMAIL($userEmail, $returnEmail)
+                    GET_ACCESS_RIGHTS
+                    GET_AUTO_MAPPING
+                    Clear-Host
+                    Write-Host -ForegroundColor "Cyan" ("
+                        CONFIRM THE ACTION:
+
+                        OBJECT EMAIL:       $($global:config.mailboxPermsInfo.objectEmail | Out-String)
+                        USER EMAIL:         $($global:config.mailboxPermsInfo.userEmail | Out-String)
+                        ACCESS RIGHTS:      $($global:config.mailboxPermsInfo.accessRights | Out-String)
+                        AUTO MAPPING:       $($global:config.mailboxPermsInfo.autoMapping | Out-String)
+
+                        [Y] TO RUN
+                        [N] TO CHANGE
+                    ")
+                    $runConfirm = Read-Host -Prompt ("INPUT ACTION")
+                    if ($runConfirm -match "[yY]") { 
+                       # Write-Host ("Add-MailboxPermission -Identity "$objectEmail" -User "$getUserEmail" -AccessRights "$accessRight" -AutoMapping $autoMapping)
+                    } else {
+                        # ADD SOME ACTION HERE
+                    }
+                }
+            }
+        }
+        2 {
+            Write-Host -ForegroundColor "Cyan" ("`nSELECTED MAILBOX SETTINGS TOOL`nLOADING FUNCTION...")
+            MAILBOX_TOOL("SETTINGS")
+        }
+        default {
+            Write-Host -ForegroundColor "Red" ("`nUNDEFINED INPUT - RETURNING...")
+            EXCHANGE_ACTIONS
+        }
+    }    
 }

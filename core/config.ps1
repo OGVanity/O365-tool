@@ -4,5 +4,11 @@ $global:config = @{
         creator   = "Tom Yeoman"
         date  = "06/07/2022"
         appver = "0.0.1"
-    }       
+    }
+    mailboxPermsInfo = @{
+        objectEmail = ""
+        userEmail = ""
+        accessRights = ""
+        autoMapping = ""
+    }   
 }
