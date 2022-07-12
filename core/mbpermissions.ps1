@@ -1,14 +1,16 @@
-<#
-FUNCTION CHECK_EMAIL ($emailData) {
-    Write-Host -ForegroundColor "Red" ("`nCONFIRM THE EMAIL ADDRESS: $emailData.`n[Y] TO CONFIRM`n[N] TO CHANGE")
+FUNCTION CHECK_EMAIL {
+    param ($emailData)
+    Write-Host -ForegroundColor "Red" ("`nCONFIRM THE EMAIL ADDRESS: $emailData`n[Y] TO CONFIRM`n[N] TO CHANGE")
     $emailConfirm = Read-Host -Prompt ("INPUT SELECTION")
     if ($emailConfirm -match "[yY]") {
-        return $returnEmail = $emailData
-    else {
-        CHECK_EMAIL
+        return ($emailData)
+    } elseif ($emailConfirm -match "[nN]") {
+        $newEmailData = Read-Host -Prompt ("ENTER EMAIL ADDRESS AGAIN")
+        CHECK_EMAIL ($newEmailData)
+    } else {
+        CHECK_EMAIL ($emailData)
     }
 }
-#>
 
 FUNCTION GET_ACCESS_RIGHTS {
     Write-Host -ForegroundColor "Cyan" ("
@@ -54,8 +56,8 @@ FUNCTION GET_AUTO_MAPPING {
     Write-Host -ForegroundColor "Cyan" ("ENABLE AUTO MAPPING:`n[Y] TO ENABLE`n[N] TO DISABLE")
     $autoMapping = Read-Host -Prompt ("INPUT SELECTION")
     if ($autoMapping -match "[yY]") { 
-        $global:config.mailboxPermsInfo.autoMapping = "false"
+        $global:config.mailboxPermsInfo.autoMapping = true
     } else {
-        $global:config.mailboxPermsInfo.autoMapping = "true"
+        $global:config.mailboxPermsInfo.autoMapping = false
     }
 }

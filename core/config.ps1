@@ -6,8 +6,6 @@ $global:config = @{
         appver = "0.0.1"
     }
     mailboxPermsInfo = @{
-        objectEmail = ""
-        userEmail = ""
         accessRights = ""
         autoMapping = ""
     }   

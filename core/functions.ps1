@@ -135,30 +135,35 @@ FUNCTION MAILBOX_TOOL ($action) {
                 |                                                                                   |               
                 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             ")
-            $permissionSelection = Read-Host -Prompt ("INPUT MODULE SELECTION (1-6)")
+            $permissionSelection = Read-Host -Prompt ("INPUT PERM TYPE SELECTION (1-6)")
             $objectEmail = Read-Host -Prompt ("ENTER EMAIL ADDRESS OF THE OBJECT BEING CHANGED")
-            #CHECK_EMAIL($objectEmail)
+            $objectEmail = CHECK_EMAIL ($objectEmail)
             switch ($permissionSelection) {
                 1 {
                     $userEmail = Read-Host -Prompt ("ENTER EMAIL ADDRESS OF THE USER GETTING PERMS")
-                    #CHECK_EMAIL($userEmail, $returnEmail)
+                    $userEmail = CHECK_EMAIL ($userEmail)
                     GET_ACCESS_RIGHTS
                     GET_AUTO_MAPPING
                     Clear-Host
                     Write-Host -ForegroundColor "Cyan" ("
                         CONFIRM THE ACTION:
 
-                        OBJECT EMAIL:       $($global:config.mailboxPermsInfo.objectEmail | Out-String)
-                        USER EMAIL:         $($global:config.mailboxPermsInfo.userEmail | Out-String)
+                        OBJECT EMAIL:       $($objectEmail)
+                        USER EMAIL:         $($userEmail)
                         ACCESS RIGHTS:      $($global:config.mailboxPermsInfo.accessRights | Out-String)
                         AUTO MAPPING:       $($global:config.mailboxPermsInfo.autoMapping | Out-String)
 
                         [Y] TO RUN
                         [N] TO CHANGE
                     ")
-                    $runConfirm = Read-Host -Prompt ("INPUT ACTION")
-                    if ($runConfirm -match "[yY]") { 
-                       # Write-Host ("Add-MailboxPermission -Identity "$objectEmail" -User "$getUserEmail" -AccessRights "$accessRight" -AutoMapping $autoMapping)
+                    $runConfirm = Read-Host -Prompt ("INPUT SELECTION")
+                    if ($runConfirm -match "[yY]") {
+                        try {
+                            Add-MailboxPermission -Identity "$objectEmail" -User "$userEmail" -AccessRights "$($global:config.mailboxPermsInfo.accessRights | Out-String)" -AutoMapping:'$'$($global:config.mailboxPermsInfo.autoMapping | Out-String)
+                        } catch {
+                            Write-Host -ForegroundColor "Red" ("`nERROR DETECTED WHEN RUNNING CMDLET - RETURNING...`n")
+                            MAILBOX_TOOL ($action)
+                        }
                     } else {
                         # ADD SOME ACTION HERE
                     }
